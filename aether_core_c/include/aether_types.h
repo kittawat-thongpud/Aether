@@ -14,6 +14,8 @@
 #include <stddef.h>
 #include <stdint.h>
 
+#include "aether_platform.h"
+
 /** Maximum number of memory segments the allocator can manage.
  *  This bound ensures deterministic behaviour and enforces fixed loop
  *  limits in accordance with the Power of Ten rules. Adjusting this
@@ -39,13 +41,6 @@ typedef int32_t aether_handle_t;
  *  visibility across threads. Offsets and sizes are measured in
  *  bytes relative to the base of the pool.
  */
-/* Forward declare spinlock type from aether_platform.h to avoid
- * circular inclusion. We include the full definition in
- * aether_platform.h, so here we simply declare the struct to
- * reference it without exposing implementation details. */
-struct aether_spinlock_s;
-typedef struct aether_spinlock_s aether_spinlock_t;
-
 typedef struct {
     uint8_t in_use;   /**< Non‑zero if this segment is allocated */
     size_t offset;    /**< Byte offset from the pool base */

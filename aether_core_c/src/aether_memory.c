@@ -41,17 +41,15 @@ aether_mem_pool_t *aether_mem_init(size_t total_size) {
     size_t aligned_size = aether_align_up(total_size);
     pool->total_size = aligned_size;
 
-    /* Allocate the actual memory region. Align using posix_memalign if available. */
-#if defined(_POSIX_VERSION)
-    void *base_ptr = NULL;
-    int res = posix_memalign(&base_ptr, AETHER_ALIGNMENT, aligned_size);
-    if (res != 0) {
+    /* Allocate the actual memory region with explicit alignment. */
+#if defined(__STDC_VERSION__) && (__STDC_VERSION__ >= 201112L)
+    pool->base = (uint8_t *)aligned_alloc(AETHER_ALIGNMENT, aligned_size);
+    if (pool->base == NULL) {
         free(pool);
         return NULL;
     }
-    pool->base = (uint8_t *)base_ptr;
 #else
-    /* Fallback to malloc; assume malloc aligns sufficiently for typical cache lines. */
+    /* Fallback for older standards; alignment may be implementation-defined. */
     pool->base = (uint8_t *)malloc(aligned_size);
     if (pool->base == NULL) {
         free(pool);
